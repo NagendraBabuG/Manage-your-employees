@@ -9,6 +9,7 @@ app.use(express.json())
 
 app.use(cors())
 app.use('/employee', require('./routes/employee'))
+app.use('/admin', require('./routes/admin'))
 
 app.get('/', (req, res) => {
     //res.redirect()
@@ -25,7 +26,7 @@ app.get('/getEmployees', async (req, res) => {
     const list = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
     res.send(list);
 });
-app.post('updateEmployee', async (req, res) => {
+app.post('/updateEmployee', async (req, res) => {
     const id = req.body.id;
     delete req.body.id;
     await Employee.doc(id).update(req.body);

@@ -56,6 +56,15 @@ const SignInForm = () => {
         console.log('i am navigating')
         resetFormFields();
        // <Navigate to='/dashboard'/>
+       if(user){
+        user.getIdToken().then((tkn)=>{
+          // set access token in session storage
+          console.log(tkn)
+          sessionStorage.setItem("accessToken", tkn);
+          //setAuthorizedUser(true);
+        })
+      }
+      //console.log(user);
     }
     catch{
         console.log('error')
@@ -77,6 +86,14 @@ const SignInForm = () => {
             // console.log(response);
             console.log(cookies)
             resetFormFields();
+            if(user){
+                user.getIdToken().then((tkn)=>{
+                  // set access token in session storage
+                  console.log(tkn)
+                  sessionStorage.setItem("accessToken", tkn);
+                  //setAuthorizedUser(true);
+                })
+            }
             //<redirect to='/dashboard'/>
             	
            // <Navigate to="/dashboard" />
