@@ -21,6 +21,10 @@ const taskSchema = new mongoose.Schema({
     },
     employeeId: {
         type: mongoose.Schema.Types.ObjectId, default: null
+    },
+    date:{
+        type:Date,
+        default: new Date()
     }
 }, { timestamps: true })
 

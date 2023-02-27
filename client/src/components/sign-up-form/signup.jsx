@@ -43,9 +43,11 @@ const SignUpForm = () => {
         email,
         password
       );
+     // await user.updateProfile({ displayName: displayName });
       setCurrentUser(user);
+      const role = "admin";
 
-      await createUserDocumentFromAuth(user, { displayName });
+      await createUserDocumentFromAuth(user, { displayName, role});
       resetFormFields();
       setCookie("nbk", user.uid ,{path: "/" });
      // navigate('/dashboard')

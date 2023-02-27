@@ -12,15 +12,37 @@ app.use(express.json())
 
 
 app.use('/api/admin', require('./routes/admin'))
+app.use('/api/employee', require('./routes/employee'))
 app.get('/',(req,res) => {
    // console.log(req);
     res.send('Hello World');
 })
 //signup
+
+app.post('/addAdmin', async (req, res) => {
+    const useremail = req.body.email, username = req.body.name, password = req.body.password
+    if(!useremail || !username || !password) return res.status(400).json({status : 'failed', data: "missing data"})
+    try{
+        const adminCreated = await AdminRole.create({
+            name : username,
+            email: useremail,
+           // employees:[]
+        })
+        if(!adminCreated) return res.status(400).json({status: 'failed'})
+        res.status(200).json({status : 'success', data : userAdded})
+    }
+    catch(error)
+    {
+
+        console.log(error)
+        res.status(400).json({status : "error in connected Database"})
+    }
+})
 app.post('/createAdmin', async(req, res) => {
     console.log(req.body)
     const useremail = req.body.email, username = req.body.name, password = req.body.password
-    
+    if(!useremail || !username || !password) return res.status(400).json({status : 'failed', data: "missing data"});
+
     const session = await mongoose.startSession();
     session.startTransaction();
     let userAdded = undefined
@@ -32,13 +54,25 @@ app.post('/createAdmin', async(req, res) => {
             {
                 email: useremail,
                 displayName: username,
-                password: password
+                password: password, 
             }, {session})
+            console.log(userAdded)
+            const db = admin.firestore()
+            const userRef = db.collection('employees').doc(userAdded.uid);
+
+            // Create the user document with some initial data
+            await userRef.set({
+              email: useremail,
+              displayName:username,
+              role: 'admin',
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              // Add any 
+            })
         
         const adminCreated = await AdminRole.create({
                 name : username,
                 email: useremail,
-               // employees:[]
+               //employees:[]
             })
         console.log(adminCreated)
         await session.commitTransaction();

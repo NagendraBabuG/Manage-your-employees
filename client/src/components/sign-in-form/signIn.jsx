@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { Navigate , useNavigate} from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { UserContext } from '../../contexts/userContext';
+import { getUserDoc } from '../../utils/firebase';
 import './style.scss';
 import {
     signInWithGooglePopup,
@@ -45,25 +46,26 @@ const SignInForm = () => {
     };
 
     const signInWithGoogle = async () => {
-        const { user } = await signInWithGooglePopup();
+        const user = await signInWithGooglePopup();
        try{ 
         //setCookie('Name', name, { path: '/' });
         setCurrentUser(user);
         setCookie("nbk", user.uid ,{path: "/" });
-        console.log(user)
-        console.log('cookie : ', cookies)
+        //console.log('user', user)
+       // console.log('cookie : ', cookies)
         await createUserDocumentFromAuth(user);
-        console.log('i am navigating')
+        //console.log('i am navigating')
         resetFormFields();
        // <Navigate to='/dashboard'/>
        if(user){
         user.getIdToken().then((tkn)=>{
           // set access token in session storage
-          console.log(tkn)
+        //  console.log(tkn)
           sessionStorage.setItem("accessToken", tkn);
           //setAuthorizedUser(true);
         })
       }
+      await getUserDoc(user)
       //console.log(user);
     }
     catch{
@@ -76,15 +78,19 @@ const SignInForm = () => {
 
         try {
             console.log(email, password)
-            const { user } = await signInAuthUserWithEmailAndPassword(
+            const {user}  = await signInAuthUserWithEmailAndPassword(
                 email,
                 password
             );
+            console.log(user);
+
+            const res = await getUserDoc(user)
+            console.log("res ", res)
             setCurrentUser(user);
             setCookie("nbk", user.uid ,{path: "/" });
             //setCookie("user", user, {expires: 1})
             // console.log(response);
-            console.log(cookies)
+            //console.log(cookies)
             resetFormFields();
             if(user){
                 user.getIdToken().then((tkn)=>{
@@ -94,6 +100,7 @@ const SignInForm = () => {
                   //setAuthorizedUser(true);
                 })
             }
+
             //<redirect to='/dashboard'/>
             	
            // <Navigate to="/dashboard" />

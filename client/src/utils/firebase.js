@@ -69,5 +69,33 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
   if(!email || !password) return;
   return await signInWithEmailAndPassword(auth, email, password);
 }
+export const getUserDoc = async (user)=>
+{
+  if(!user) return null
+  console.log(user.uid)
+  const userDocRef = doc(db, 'employees', user.uid);
+  console.log(userDocRef)
+  const userSnapshot = await getDoc(userDocRef);
+  if(!userSnapshot.exists()) return null
+  console.log('exists')
+  const userDoc = userSnapshot.data()
+  sessionStorage.setItem("userData", userDoc.role)
+  console.log("userSnapshot ", userDoc)
+  return userDoc;
 
+  //const usersCollection = firebase.firestore().collection("employees");
+
+            // // Query the collection for the user document with the corresponding UID
+            // usersCollection.doc(user.uid).get().then((doc) => {
+            //   if (doc.exists) {
+            //     // User document found
+            //     const userData = doc.data(); 
+            //     console.log(userData)// Get the user data from the document
+            //     sessionStorage.setItem("userData", userData)
+            //     // Use the user data as needed
+            //   } else {
+            //     // User document not found
+            //   }
+            // })
+}
 export const signOutUser = () => signOut(auth);

@@ -7,11 +7,8 @@ const middleware = require('../middleware/index')
 
 
 const router = express.Router()
-//const {createUser} = require('../config/firebase-config')
-//router.use(express.json())
-//router.use(middleware.decodeToken)
+
 router.use(middleware)
-//app.use('/api/admin', require('./routes/admin'))
 
 router.get('/', async (req, res)=> {
     res.status(200).json({status : "it's working!!!"})
@@ -35,6 +32,7 @@ router.post('/addEmployee', async (req, res) => {
         userAdded = await admin.auth().createUser(
             {
                 email: email,
+                role: "employee",
                 displayName: username,
                 password: password}, {session})
         
@@ -52,6 +50,18 @@ router.post('/addEmployee', async (req, res) => {
         adminId : findAdmin._id
     })
     console.log('employe Added ', employeeAdded)
+    const db = admin.firestore()
+    const userRef = db.collection('employees').doc(userAdded.uid);
+
+    // Create the user document with some initial data
+    await userRef.set({
+    
+      email: email,
+      displayName:username,
+      role: 'employee',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      // Add any 
+    })
     const UpdatedAdmin = await AdminRole.updateOne({email : adminEmail}, {$push : {employees : employeeAdded._id}});
     
     console.log(UpdatedAdmin)
@@ -73,29 +83,7 @@ router.post('/addEmployee', async (req, res) => {
     }
 
 })
-// router.get('/getEmployees', async (req, res)=> {
-//     const adminEmail = req.body.email
-//     try{
-//         let result = []
-//         const adminObject = await AdminRole.findOne({email : adminEmail})
-//         if(!adminObject) return res.status(400).json({status : 'admin email is not present in database'}) 
-//         console.log(adminObject)
-//         const employeeIds = adminObject.employees
-//         console.log(employeeIds)
-//         for(let i = 0 ; i < employeeIds.length; i++)
-//         {
-//             result.push(await Employee.findOne({_id : employeeIds[i]}))
-//         }
-//         console.log(result)
-//         return res.status(200).json({status : 'success', data : result})
-//     }
-//     catch(error)
-//     {
-//         console.log(error)
-//         res.status(400).json({status : "error"})
 
-//     }
-// })
 router.get('/myEmployees', async (req, res) => {
   //  console.log(req.body)
     const adminEmail = req.body.email
@@ -121,10 +109,32 @@ on signup user should get replies popup and then should get redirected login pag
 
 */
 
-router.post('/editDetails', async (req, res) => {
-    const email = req.body.email, name = req.body.name
-
+router.put('/editMyName', async (req, res) => {
+    const email = req.body.email, username = req.body.name
+    try{
+        const UpdatedAdmin = await AdminRole.updateOne({email : email}, {name : username});
+        if(!UpdatedAdmin) return res.status(400).json({status : 'failed', error : 'cannot perfom the operation'})
+        res.status(200).json({status : 'success', data : UpdatedAdmin})
+    }
+    catch(error)
+    {
+        res.status(400).json({status : 'failed', error : error})
+    }
 })
+router.put('/editMyContact', async(req, res) => {
+    const contact = req.body.contact, useremail = req.body.email
+    try{
+        const UpdatedAdmin = await AdminRole.updateOne({email : useremail}, {conatct : contact})
+        if(!UpdatedAdmin) return res.status(400).json({status : 'failed', error : 'cannot perfom the operation'})
+        res.status(200).json({status : 'success', data : UpdatedAdmin})
+    }
+    catch(error)
+    {
+        res.status(400).json({status : 'failed', error : error})
+
+    }
+})
+
 router.get('/getDetails', async(req, res) => {
     const employeeEmail = req.body.employeeEmail
     if(!employeeEmail) res.status(400).json({status : 'failed', data : "missing data"})
