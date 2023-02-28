@@ -39,7 +39,7 @@ app.post('/addAdmin', async (req, res) => {
     }
 })
 app.post('/createAdmin', async(req, res) => {
-    console.log(req.body)
+    console.log(req.body, "body")
     const useremail = req.body.email, username = req.body.name, password = req.body.password
     if(!useremail || !username || !password) return res.status(400).json({status : 'failed', data: "missing data"});
 
@@ -88,7 +88,7 @@ app.post('/createAdmin', async(req, res) => {
         await session.abortTransaction();
         console.error('Transaction aborted:', error);
       
-        res.status(400).json({status : "error in connected Database"})   
+        res.status(400).json({status : "error in connected Database", data: 'error'})   
     }
 
 })

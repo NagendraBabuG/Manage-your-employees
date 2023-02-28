@@ -4,6 +4,7 @@ import { useCookies } from 'react-cookie';
 import { UserContext } from '../../contexts/userContext';
 import { getUserDoc } from '../../utils/firebase';
 import './style.scss';
+import axios from 'axios'
 import {
     signInWithGooglePopup,
     createUserDocumentFromAuth,
@@ -90,7 +91,9 @@ const SignInForm = () => {
             setCookie("nbk", user.uid ,{path: "/" });
             //setCookie("user", user, {expires: 1})
             // console.log(response);
+            sessionStorage.setItem("userInfo", res);
             //console.log(cookies)
+            
             resetFormFields();
             if(user){
                 user.getIdToken().then((tkn)=>{

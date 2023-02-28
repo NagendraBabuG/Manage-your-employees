@@ -149,4 +149,18 @@ router.get('/getDetails', async(req, res) => {
         res.status(400).json({status : "error" , error : error})
     }
 })
+router.get('/myDetails', async (req, res) => {
+    const email = req.body.email
+    if(!email) res.status(400).json({status : 'failed', data : "missing data"})
+    try{
+        const adminObject = await AdminRole.findOne({email : email})
+        if(!adminObject) res.status(400).json({status : 'failed', data : "user not found"})
+        res.status(200).json({status : "success", data: adminObject})
+    }
+    catch(error)
+    {
+        console.log(error)
+        res.status(400).json({status : "error" , error : error})
+    }
+})
 module.exports = router
